@@ -389,7 +389,7 @@ public class Escalator extends Widget implements RequiresResize,
                     getScroll().setScrollPosByDelta(offset * progress);
                 }
                 public double interpolate(double progress) {
-                    return Math.sqrt(1 - (progress - 1) * (progress - 1));
+                    return (Math.abs(velocity) * 0.175) * (1 - progress);
                 };
                 protected void onComplete() {
                     escalator.body.domSorter.reschedule();
@@ -429,7 +429,7 @@ public class Escalator extends Widget implements RequiresResize,
                 vertical = Math.abs(moveY - y) > Math.abs(moveX - x);
                 int delta = vertical ? (moveY - y) : (moveX - x);
 
-                double v = 1000 * delta / (1 + elapsed);
+                double v = 10 * delta / (1 + elapsed);
                 velocity = 0.8 * v + 0.2 * velocity;
 
                 getScroll().setScrollPosByDelta(delta);
@@ -443,7 +443,7 @@ public class Escalator extends Widget implements RequiresResize,
 
 
             public void touchEnd(final CustomTouchEvent event) {
-                if (event.getNativeEvent().getTouches().length() != 0 || Math.abs(velocity) < 10) {
+                if (event.getNativeEvent().getTouches().length() != 0 || Math.abs(velocity) < 5) {
                     return;
                 }
 
