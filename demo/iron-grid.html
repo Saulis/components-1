@@ -7,13 +7,19 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel='import' href='../../polymer/polymer.html'>
   <link rel="import" href="../../iron-list/iron-list.html">
+  <link rel='import' href='../../paper-ripple/paper-ripple.html'>
 </head>
 <body>
 
   <dom-module id="iron-grid">
     <style>
+        :host {
+          font: 400 100%/1.5 Roboto, sans-serif;
+          font-size: 13px;
+          font-weight: 400;
+        }
+
         #selector {
-        padding-top: 8px;
         padding-bottom: 8px;
 
         /* Fixes item background from getting on top of scrollbars on Safari */
@@ -75,7 +81,75 @@
         border: 2px solid #7a7a7a;
         border-radius: 2px;
         cursor: pointer;
-        transition: background-color 120ms, border-color 120ms;
+        transition: background-color 120ms;
+      }
+
+      input[type="checkbox"]:focus {
+        outline: none;
+      }
+
+      input[type="checkbox"] + label:after {
+        content: url(img/tick.svg);
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        display: block;
+        width: 16px;
+        height: 17px;
+        transition: all 200ms;
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        -webkit-transform-origin: 40% 80%;
+        transform-origin: 40% 80%;
+      }
+
+      .item[selected] input[type="checkbox"] + label {
+        background-color: var(--default-primary-color, #03A9F4);
+        border-color: transparent;
+      }
+
+      .item[selected] input[type="checkbox"] + label:after {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+
+      input[type="checkbox"]:indeterminate + label:after {
+        content: "–";
+        font-family: arial;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 1;
+        text-align: center;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        transition: none;
+      }
+
+      /* Activation "splash" */
+      input[type="checkbox"] + label:before {
+        content: "";
+        position: absolute;
+        top: -13px;
+        left: -13px;
+        width: 41px;
+        height: 41px;
+        border-radius: 50%;
+        background-color: #666;
+        opacity: 0;
+        -webkit-transform: scale(0.8);
+        transform: scale(0.8);
+        transition: all 180ms cubic-bezier(0.75,.0,0.25,1);
+      }
+
+      input[type="checkbox"] + label:active:before {
+        transform: scale(1.1);
+        opacity: 0.15;
+        transition-duration: 80ms;
+        transition-property: all;
+      }
+
+      .item[selected] input[type="checkbox"] + label:before {
+        background-color: var(--default-primary-color, #03A9F4);
       }
 
       div.frozen {
@@ -83,32 +157,95 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        z-index: 1;
+
+        /*background-color: #fff;*/
+      }
+
+      .header {
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 2px 0 rgba(0, 0, 0, 0.075), 0 3px 0 rgba(0, 0, 0, 0.05), 0 4px 0 rgba(0, 0, 0, 0.015);
+        height: 56px;
+        width: 450px;
+        padding: 0 24px 0 24px;
+        display: inline-flex;
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 12px,
+        font-weight: 500;
+
         background-color: #fff;
       }
 
-      .item: {
-
+      .item[selected] {
+        background-color: #f5f5f5;
       }
+
+      .item:after {
+        background-color: var(--default-primary-color, #03A9F4);
+        bottom: 0;
+        content: "";
+        height: 2px;
+        left: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+        transition: all 0.16s ease-in-out;
+        -webkit-transform: scaleX(0.0);
+        transform: scaleX(0.0);
+        z-index: 1;
+      }
+
+      .item[selected]:after {
+        -webkit-transform: scaleX(1.0);
+        transform: scaleX(1.0);
+      }
+
+      .item[selected] {
+        -webkit-animation: item-focused 820ms ease-in-out;
+        animation: item-focused 820ms ease-in-out;
+      }
+
+      @-webkit-keyframes item-focused {
+        50% {
+          color: #03A9F4;
+        } 100% {
+          color: inherit;
+        }
+      }
+
+      @keyframes item-focused {
+        50% {
+          color: #03A9F4;
+        } 100% {
+          color: inherit;
+        }
+      }
+
+      paper-ripple {
+      color: rgba(0, 0, 0, .54);
+    }
     </style>
 
     <template>
       <div id="scroller" style="overflow:auto; width: 360px; height: 400px" scroller="[[_getScroller()]]">
-        <div class="header" style="height:30px;width:360px">
+        <div class="header" id="header">
           <div class="frozen">
-            <div>foo</div>
-            <div>Name</div>
+            <div class="checkbox">
+              <span class="vaadin-grid-selection-checkbox vaadin-grid style-scope">
+                <input type="checkbox" value="on" id="gwt-uid-5" tabindex="0" class="vaadin-grid style-scope">
+                <label for="gwt-uid-5" class="vaadin-grid style-scope"></label>
+                <paper-ripple class='circle' center></paper-ripple>
+              </span>
+            </div>
+            <div class="cell">Name</div>
           </div>
-          <div class="cell">[[item.name]]</div>
-          <div class="cell">[[item.surname]]</div>
-          <div class="cell">[[item.activity]]</div>
-          <div class="cell">[[item.target]]</div>
+          <div class="cell">Surname</div>
+          <div class="cell">Activity</div>
+          <div class="cell">Target</div>
         </div>
-        <iron-list id="selector">
+        <iron-list id="selector" selection-enabled>
           <template>
-            <div class="item">
+            <div class="item" selected$=[[selected]]>
               <div class="frozen">
-                <div class="checkbox">
+                <div class="checkbox" on-tap="_selectItem">
                   <span class="vaadin-grid-selection-checkbox vaadin-grid style-scope">
                     <input type="checkbox" value="on" id="gwt-uid-5" tabindex="0" class="vaadin-grid style-scope">
                     <label for="gwt-uid-5" class="vaadin-grid style-scope"></label>
@@ -135,6 +272,18 @@
     Polymer({
       is: 'iron-grid',
 
+      listeners: {
+        'selector.selected-items-changed': '_selectedItemsChanged'
+      },
+
+      _selectItem: function() {
+        console.log('hoohaa');
+      },
+
+      _selectedItemsChanged: function(e) {
+        //console.log(e);
+      },
+
       ready: function() {
         this.employees = [];
         var names = ['Artur', 'Patrik', 'Henrik', 'Teemu'];
@@ -154,6 +303,7 @@
 
           for (var i=0;i < frozen.length; i++) {
             frozen[i].style.transform = 'translate3d(' + (this.$.scroller.scrollLeft) + 'px, 0px, 0px)';
+            this.$.header.style.transform = 'translate3d(0px, ' + (this.$.scroller.scrollTop) + 'px, 0px)';
           }
         }.bind(this));
       },
