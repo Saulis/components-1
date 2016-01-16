@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+  <title>vaadin-grid Code Examples</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel='import' href='../../polymer/polymer.html'>
+  <link rel="import" href="../../iron-list/iron-list.html">
+</head>
+<body>
+
+  <dom-module id="iron-grid">
+    <style>
+        #selector {
+        padding-top: 8px;
+        padding-bottom: 8px;
+
+        /* Fixes item background from getting on top of scrollbars on Safari */
+        transform: translate3d(0,0,0);
+      }
+
+      #selector {
+
+      }
+
+      #selector .item {
+        cursor: pointer;
+        height: 48px;
+        width: 450px;
+        padding: 0 24px 0 24px;
+        color: var(--primary-text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-flex;
+
+        border-bottom: 1px solid #e3e3e3;
+      }
+
+      .item:hover {
+        background: #eee;
+      }
+
+      #selector .item[selected] {
+        color: var(--default-primary-color);
+      }
+
+      .cell {
+        width: 90px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      div.checkbox {
+        width: 66px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .checkbox input {
+        position: absolute;
+        opacity: 0;
+      }
+
+      .checkbox label {
+        position: relative;
+        left: 0;
+        box-sizing: border-box;
+        display: block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #7a7a7a;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: background-color 120ms, border-color 120ms;
+      }
+
+      div.frozen {
+        border-right: 1px solid #e3e3e3;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        background-color: #fff;
+      }
+
+      .item: {
+
+      }
+    </style>
+
+    <template>
+      <div id="scroller" style="overflow:auto; width: 360px; height: 400px" scroller="[[_getScroller()]]">
+        <div class="header" style="height:30px;width:360px">
+          <div class="frozen">
+            <div>foo</div>
+            <div>Name</div>
+          </div>
+          <div class="cell">[[item.name]]</div>
+          <div class="cell">[[item.surname]]</div>
+          <div class="cell">[[item.activity]]</div>
+          <div class="cell">[[item.target]]</div>
+        </div>
+        <iron-list id="selector">
+          <template>
+            <div class="item">
+              <div class="frozen">
+                <div class="checkbox">
+                  <span class="vaadin-grid-selection-checkbox vaadin-grid style-scope">
+                    <input type="checkbox" value="on" id="gwt-uid-5" tabindex="0" class="vaadin-grid style-scope">
+                    <label for="gwt-uid-5" class="vaadin-grid style-scope"></label>
+                  </span>
+                </div>
+                <div class="cell">[[item.name]]</div>
+              </div>
+              <div class="cell">[[item.surname]]</div>
+              <div class="cell">[[item.activity]]</div>
+              <div class="cell">[[item.target]]</div>
+            </div>
+          </template>
+        </iron-list>
+    </div>
+    </template>
+  </dom-module>
+
+  <script>
+    function random(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+
+    Polymer({
+      is: 'iron-grid',
+
+      ready: function() {
+        this.employees = [];
+        var names = ['Artur', 'Patrik', 'Henrik', 'Teemu'];
+        var surnames = ['Signell', 'Lehtinen', 'Ahlroos', 'Paul'];
+        var activities = ['Design', 'Implement', 'Polish', 'Deliver'];
+        var targets = ['soup', 'Vaadin', 'dog', 'world peace'];
+        for (var i = 0; i < 400; i++) {
+          var row = [random(names), random(surnames), random(activities), random(targets)];
+          this.employees.push({ name: random(names), surname: random(surnames), activity: random(activities), target: random(targets), nice: 'foooooooooooBAR!'
+          });
+        }
+
+        this.$.selector.items = this.employees;
+
+        this.$.scroller.addEventListener('scroll', function(e) {
+          var frozen = Polymer.dom(this.root).querySelectorAll('.frozen');
+
+          for (var i=0;i < frozen.length; i++) {
+            frozen[i].style.transform = 'translate3d(' + (this.$.scroller.scrollLeft) + 'px, 0px, 0px)';
+          }
+        }.bind(this));
+      },
+
+      _getScroller: function() {
+        return this.$.scroller;
+      }
+    });
+    //var grid = document.querySelector('#grid');
+    //grid.$.selector.items = ['foo', 'bar'];
+  </script>
+
+  <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px"></iron-grid>
+
+</body>
+</html>
