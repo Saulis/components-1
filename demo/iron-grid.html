@@ -272,8 +272,9 @@
                 <div class="cell">[[_getColumnData(columns.*, item, 0)]]</div>
               </div>
               <div class="cell">[[_getColumnData(columns.*, item, 1)]]</div>
-              <grapp-template-ref ref="default-cell" bind="[[_getColumnData2(columns.*, item, 2)]]"></grapp-template-ref>
-              <grapp-template-ref bind="[[_getColumnData2(columns.*, item, 3)]]"></grapp-template-ref>
+              <div class="cell">[[_getColumnData(columns.*, item, 2)]]</div>
+              <grapp-template-ref placeholder="[[index]]" bind="[[_getColumnData2(columns.*, item, 3)]]"></grapp-template-ref>
+              <content select="foobar"></content>
             </div>
           </template>
         </iron-list>
@@ -312,6 +313,23 @@
 
       listeners: {
         'selector.selected-items-changed': '_selectedItemsChanged'
+      },
+
+      _getPlaceholder: function(item, index) {
+        var key = this.$.selector._collection.getKey(item);
+        var pidx = this.$.selector._physicalIndexForKey[key];
+        pidx = pidx || index;
+
+        var el = this.$.selector._physicalItems[pidx];
+        //debugger;
+        if (el !== undefined && !el.placeholder) {
+          var placeholder = document.createElement('div');
+          placeholder.classList.add('foo' + index);
+          placeholder.innerText = index;
+          Polymer.dom(this).appendChild(placeholder);
+
+          el.placeholder = placeholder;
+        }
       },
 
       _selectItem: function() {
@@ -443,8 +461,31 @@
       as: {
         type: String,
         observer: '_bindChanged'
+      },
+
+      placeholder: {
+        type: Object,
+        observer: '_placeholderChanged'
       }
     },
+
+    _placeholderChanged: function(index) {
+      var item = this.parentElement;
+
+      if (!item.placeholder) {
+        var placeholder = document.createElement('div');
+        placeholder.classList.add('foo' + index);
+        placeholder.innerText = index;
+        Polymer.dom(this.domHost).appendChild(placeholder);
+
+        item.placeholder = placeholder;
+
+      }
+
+      // HACKKKSOR
+      item.querySelector('content').setAttribute('select', '.' + item.placeholder.classList[0]);
+    },
+
     attached: function() {
       return this._stamp();
     },
@@ -488,7 +529,12 @@
       }
       templateRoot = (new template.ctor(bind, template)).root;
       this._children = Array.prototype.slice.call(templateRoot.childNodes);
-      return Polymer.dom(this._parent).insertBefore(templateRoot, this);
+
+      //HACKED AGAIN
+      //return Polymer.dom(this._parent).insertBefore(templateRoot, this);
+      this._parent.placeholder.innerHTML = '';
+      //debugger;
+      return Polymer.dom(this._parent.placeholder).appendChild(templateRoot);
     },
     _removeChildren: function() {
       var child, i, len, ref, results;
@@ -497,7 +543,8 @@
         results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           child = ref[i];
-          results.push(Polymer.dom(this._parent).removeChild(child));
+          //results.push(Polymer.dom(this._parent).removeChild(child));
+          //results.push(Polymer.dom(this._parent.placeholder).removeChild(child));
         }
         return results;
       }
@@ -507,10 +554,17 @@
     //grid.$.selector.items = ['foo', 'bar'];
   </script>
 
+  <input type="text">white!</input>
 
   <template is="dom-bind">
+    <style>
+      #grid input {
+        background-color: green;
+      }
+    </style>
+
     <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px">
-      <template is="dom-template">
+      <template is="dom-template" id="nice">
         <div class="cell">
           <input type="text" style="width: 50px;">[[data]]</input>
         </div>
