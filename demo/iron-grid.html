@@ -8,6 +8,7 @@
   <link rel='import' href='../../polymer/polymer.html'>
   <link rel="import" href="../../iron-list/iron-list.html">
   <link rel='import' href='../../paper-ripple/paper-ripple.html'>
+  <link rel='import' href='../../dom-bindref/dom-bindref.html'>
 </head>
 <body>
 
@@ -232,6 +233,7 @@
     }
     </style>
 
+
     <template>
       <div id="scroller" style="overflow:auto; width: 360px; height: 400px" scroller="[[_getScroller()]]">
         <div class="header" id="header" on-dragover="_dragOver" on-dragleave="_dragLeave" on-dragend='_drop'>
@@ -249,6 +251,11 @@
           <div class="cell">Activity</div>
           <div class="cell">Target</div>
         </div>
+
+        <template is="dom-template" id="foo">
+          <div class="cell">foo</div>
+        </template>
+
         <iron-list id="selector" selection-enabled>
           <template>
             <div class="item" selected$=[[selected]]>
@@ -264,6 +271,7 @@
               <div class="cell">[[_getColumnData(columns.*, item, 1)]]</div>
               <div class="cell">[[item.activity]]</div>
               <div class="cell">[[item.target]]</div>
+              <bind-ref ref="foo"></bind-ref>
             </div>
           </template>
         </iron-list>
@@ -407,12 +415,53 @@
         return this.$.scroller;
       }
     });
+
+    Polymer({
+      is: 'bind-ref',
+
+      properties: {
+        ref: {
+          type: String,
+          observer: 'refChanged',
+        },
+      },
+
+      refChanged: function(newRef, oldRef) {
+        if (oldRef != undefined) {
+          this._removeChildren();
+          this._stamp();
+        }
+      },
+
+      _stamp: function() {
+        this._parent = Polymer.dom(this).parentNode;
+        var rootEl = this._parent;
+        while (Polymer.dom(rootEl).parentNode) {
+          rootEl = Polymer.dom(rootEl).parentNode;
+        }
+
+        var tpl = Polymer.dom(rootEl).querySelector('#' + this.ref);
+        var tplRoot = tpl.stamp().root;
+        this._children = Array.prototype.slice.call(tplRoot.childNodes);
+        Polymer.dom(this._parent).insertBefore(tplRoot, this);
+      },
+
+      _removeChildren: function() {
+        for (var i = 0; i < this._children.length; i++) {
+          Polymer.dom(this._parent).removeChild(this._children[i]);
+        }
+      },
+
+      attached: function() { this._stamp(); },
+      detached: function() { this._removeChildren(); },
+    });
     //var grid = document.querySelector('#grid');
     //grid.$.selector.items = ['foo', 'bar'];
   </script>
+  <template is="dom-bind">
+    <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px">
+    </iron-grid>
 
-  <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px">
-  </iron-grid>
-
+  </template>
 </body>
 </html>
