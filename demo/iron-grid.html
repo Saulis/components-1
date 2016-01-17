@@ -58,6 +58,7 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
+        overflow: hidden;
       }
 
       div.checkbox {
@@ -159,7 +160,7 @@
         justify-content: center;
         align-items: center;
 
-        /*background-color: #fff;*/
+        background-color: #fff;
       }
 
       .header {
@@ -252,8 +253,10 @@
           <div class="cell">Target</div>
         </div>
 
-        <template is="dom-template" id="foo">
-          <div class="cell">foo</div>
+        <content select="template"></content>
+
+        <template is="dom-template" id="default-cell">
+          <div class="cell">[[data]]</div>
         </template>
 
         <iron-list id="selector" selection-enabled>
@@ -269,9 +272,8 @@
                 <div class="cell">[[_getColumnData(columns.*, item, 0)]]</div>
               </div>
               <div class="cell">[[_getColumnData(columns.*, item, 1)]]</div>
-              <div class="cell">[[item.activity]]</div>
-              <div class="cell">[[item.target]]</div>
-              <bind-ref ref="foo"></bind-ref>
+              <grapp-template-ref ref="default-cell" bind="[[_getColumnData2(columns.*, item, 2)]]"></grapp-template-ref>
+              <grapp-template-ref bind="[[_getColumnData2(columns.*, item, 3)]]"></grapp-template-ref>
             </div>
           </template>
         </iron-list>
@@ -316,6 +318,17 @@
         console.log('hoohaa');
       },
 
+      _bind: function(item) {
+        //{"name":"[[item.name]]"}
+        return {data: item.name};
+      },
+
+      _getColumnData2: function(columns, item, columIndex) {
+        //console.log(columns);
+        var prop = columns.base[columIndex];
+        return {data: item[prop] };
+      },
+
       _dragme: function(e) {
         if (e.detail.state == 'start') {
           this._hovered = e.detail.hover();
@@ -356,7 +369,7 @@
       },
 
       _columnsChanged: function() {
-        console.log(this.columns[0]);
+        //console.log(this.columns[0]);
       },
 
       _dragOver: function(e) {
@@ -377,7 +390,7 @@
       },
 
       _getColumnData: function(columns, item, columIndex) {
-        console.log(columns);
+        //console.log(columns);
         var prop = columns.base[columIndex];
         return item[prop];
       },
@@ -417,49 +430,91 @@
     });
 
     Polymer({
-      is: 'bind-ref',
-
-      properties: {
-        ref: {
-          type: String,
-          observer: 'refChanged',
-        },
+    is: 'grapp-template-ref',
+    properties: {
+      ref: {
+        type: String,
+        observer: '_refChanged'
       },
+      bind: {
+        type: Object,
+        observer: '_bindChanged'
+      },
+      as: {
+        type: String,
+        observer: '_bindChanged'
+      }
+    },
+    attached: function() {
+      return this._stamp();
+    },
+    detached: function() {
+      return this._removeChildren();
+    },
+    _refChanged: function(newRef, oldRef) {
+      if (oldRef) {
+        this._removeChildren();
+        return this._stamp();
+      }
+    },
+    _bindChanged: function(newBind, oldBind) {
+      if (oldBind) {
+        this._removeChildren();
+        return this._stamp();
+      }
+    },
+    _stamp: function() {
+      var bind, root, template, templateRoot;
+      this._parent = Polymer.dom(this).parentNode;
+      root = this._parent;
+      while (Polymer.dom(root).parentNode) {
+        root = Polymer.dom(root).parentNode;
+      }
 
-      refChanged: function(newRef, oldRef) {
-        if (oldRef != undefined) {
-          this._removeChildren();
-          this._stamp();
+      if (!this.ref) {
+        template = Polymer.dom(root).children[2].children[1].getDistributedNodes()[0];
+      } else {
+        template = Polymer.dom(root).querySelector("template#" + this.ref);
+        if (!template) {
+          template = document.querySelector("template#" + this.ref);
         }
-      },
+      }
 
-      _stamp: function() {
-        this._parent = Polymer.dom(this).parentNode;
-        var rootEl = this._parent;
-        while (Polymer.dom(rootEl).parentNode) {
-          rootEl = Polymer.dom(rootEl).parentNode;
+      bind = {};
+      if (this.as) {
+        bind[this.as] = this.bind;
+      } else {
+        bind = this.bind;
+      }
+      templateRoot = (new template.ctor(bind, template)).root;
+      this._children = Array.prototype.slice.call(templateRoot.childNodes);
+      return Polymer.dom(this._parent).insertBefore(templateRoot, this);
+    },
+    _removeChildren: function() {
+      var child, i, len, ref, results;
+      if (this._children) {
+        ref = this._children;
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          child = ref[i];
+          results.push(Polymer.dom(this._parent).removeChild(child));
         }
-
-        var tpl = Polymer.dom(rootEl).querySelector('#' + this.ref);
-        var tplRoot = tpl.stamp().root;
-        this._children = Array.prototype.slice.call(tplRoot.childNodes);
-        Polymer.dom(this._parent).insertBefore(tplRoot, this);
-      },
-
-      _removeChildren: function() {
-        for (var i = 0; i < this._children.length; i++) {
-          Polymer.dom(this._parent).removeChild(this._children[i]);
-        }
-      },
-
-      attached: function() { this._stamp(); },
-      detached: function() { this._removeChildren(); },
-    });
+        return results;
+      }
+    }
+  });
     //var grid = document.querySelector('#grid');
     //grid.$.selector.items = ['foo', 'bar'];
   </script>
+
+
   <template is="dom-bind">
     <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px">
+      <template is="dom-template">
+        <div class="cell">
+          <input type="text" style="width: 50px;">[[data]]</input>
+        </div>
+      </template>
     </iron-grid>
 
   </template>
