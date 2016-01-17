@@ -259,9 +259,9 @@
                     <label for="gwt-uid-5" class="vaadin-grid style-scope"></label>
                   </span>
                 </div>
-                <div class="cell">[[item.name]]</div>
+                <div class="cell">[[_getColumnData(columns.*, item, 0)]]</div>
               </div>
-              <div class="cell">[[item.surname]]</div>
+              <div class="cell">[[_getColumnData(columns.*, item, 1)]]</div>
               <div class="cell">[[item.activity]]</div>
               <div class="cell">[[item.target]]</div>
             </div>
@@ -279,6 +279,26 @@
 
     Polymer({
       is: 'iron-grid',
+
+      properties: {
+        columns: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return [];
+          },
+        },
+
+        firstColumn: {
+          type: String,
+          notify: true,
+          computed: '_firstColumn(columns)'
+        }
+      },
+
+      observers: [
+        '_columnsChanged(columns.*)',
+      ],
 
       listeners: {
         'selector.selected-items-changed': '_selectedItemsChanged'
@@ -314,6 +334,21 @@
         var text = cells[1].innerText;
         cells[1].innerText = cells[0].innerText;
         cells[0].innerText = text;
+
+        var col = this.columns[1];
+        //this.columns[1] = this.columns[0];
+
+        this.shift('columns');
+        //this.columns[0] = col;
+
+      },
+
+      _firstColumn: function(columns) {
+        return columns[0];
+      },
+
+      _columnsChanged: function() {
+        console.log(this.columns[0]);
       },
 
       _dragOver: function(e) {
@@ -333,7 +368,14 @@
         //console.log(e);
       },
 
+      _getColumnData: function(columns, item, columIndex) {
+        console.log(columns);
+        var prop = columns.base[columIndex];
+        return item[prop];
+      },
+
       ready: function() {
+        this.columns = ['name', 'surname', 'activity', 'target'];
         this.$.header.addEventListener('drop', function(e) {
           console.log(e);
         });
@@ -369,7 +411,8 @@
     //grid.$.selector.items = ['foo', 'bar'];
   </script>
 
-  <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px"></iron-grid>
+  <iron-grid id="grid" style="position: absolute;top: 200px; left: 200px">
+  </iron-grid>
 
 </body>
 </html>
