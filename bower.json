@@ -25,7 +25,8 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.1.1",
-    "dom-bindref": "~1.0.0"
+    "dom-bindref": "~1.0.0",
+    "iron-list": "polymerelements/iron-list#~1.1.7"
   },
   "devDependencies": {
     "web-component-tester": "4.0.3",
