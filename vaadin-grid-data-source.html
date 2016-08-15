@@ -1,0 +1,76 @@
+<dom-module id="vaadin-grid-data-source">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'vaadin-grid-data-source',
+
+      properties: {
+        dataSource: {
+          type: Function,
+          notify: true,
+          value: function() {
+            return function(index, callback) {
+              var page = this._getPageForIndex(index);
+
+              if (this._cache[page]) {
+                callback(index, this._cache[page][index - page * this.pageSize]);
+                return;
+              }
+
+              if (this._pendingRequests[page]) {
+                this._pendingRequests[page].push({index: index, callback: callback});
+              } else {
+                this._pendingRequests[page] = [{index: index, callback: callback}];
+                this._loadPage(page);
+              }
+            }.bind(this);
+          }
+        },
+
+        pageSize: {
+          type: Number,
+          value: 50
+        },
+
+        _cache: {
+          value: function() {
+            return {};
+          }
+        },
+
+        _pendingRequests: {
+          value: function() {
+            return {};
+          }
+        }
+      },
+
+      _loadPage: function(page) {
+        console.log(page);
+        setTimeout(function() {
+          var cached = [];
+          for(var i=0;i<this.pageSize;i++) {
+            cached.push({});
+          }
+          this._cache[page] = cached;
+
+          this._pendingRequests[page].forEach(function(req) {
+            req.callback(req.index, cached[req.index - this.pageSize * page]);
+          });
+          delete this._pendingRequests[page];
+        }.bind(this), 10);
+      },
+
+      _getPageForIndex: function(index) {
+        return Math.floor(index / this.pageSize);
+      }
+    });
+  </script>
+</dom-module>

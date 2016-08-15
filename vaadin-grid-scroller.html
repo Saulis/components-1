@@ -82,6 +82,10 @@
         background-color: lightgrey;
       }
 
+      tr {
+        min-height: 100px;
+      }
+
       tr:not([hidden]) {
         display: flex;
         width: 100%;
@@ -158,7 +162,7 @@
 
     observers: [
       '_columnsChanged(columns, frozenColumns, _physicalCount, _physicalItems)',
-      '_sizeChanged(size)'
+      '_sizeChanged(size, dataSource)'
     ],
 
     // TODO: we should observe _physicalItems.splices instead of _physicalCount
@@ -209,12 +213,18 @@
         this._physicalCount = Math.max(1, Math.min(DEFAULT_PHYSICAL_COUNT, this._virtualCount));
         this._physicalItems = this._createPool(this._physicalCount);
         this._physicalSizes = new Array(this._physicalCount);
+        console.log('foo');
+        this._assignModels();
+
       }
 
-      this._physicalStart = 0;
+      this.async(function() {
+        this._ready = true;
+        this._physicalStart = 0;
 
-      this._itemsRendered = false;
-      this._debounceTemplate(this._render);
+        this._itemsRendered = false;
+        this._debounceTemplate(this._render);
+      }, 2000);
     },
 
     /**
@@ -222,6 +232,7 @@
      * @param {!Array<number>=} itemSet
      */
     _assignModels: function(itemSet) {
+      // debugger;
       this._iterateItems(function(pidx, vidx) {
         var el = this._physicalItems[pidx];
         el.index = vidx + this._vidxOffset;

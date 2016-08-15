@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="vaadin-grid-scroller.html">
 <link rel="import" href="vaadin-grid-column.html">
+<link rel="import" href="vaadin-grid-data-source.html">
 
 <dom-module id="vaadin-grid">
   <style>
@@ -15,7 +16,10 @@
     }
   </style>
   <template>
-    <vaadin-grid-scroller size="[[size]]" id="scroller" columns="[[columns]]" frozen-columns=[[frozenColumns]] content-target=[[_getContentTarget()]]>
+    <vaadin-grid-data-source data-source="{{_dataSource}}">
+
+    </vaadin-grid-data-source>
+    <vaadin-grid-scroller size="[[size]]" id="scroller" columns="[[columns]]" data-source="[[_dataSource]]" frozen-columns=[[frozenColumns]] content-target=[[_getContentTarget()]]>
       <content></content>
 
     </vaadin-grid-scroller>

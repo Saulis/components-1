@@ -354,7 +354,7 @@
 
       attached: function() {
         this.updateViewportBoundaries();
-        this._render();
+
         // `iron-resize` is fired when the list is attached if the event is added
         // before attached causing unnecessary work.
         this.listen(this, 'iron-resize', '_resizeHandler');
@@ -416,9 +416,11 @@
         // Base case 2: If the physical size is optimal and the list's client height is full
         // with physical items, don't increase the pool.
         var isClientHeightFull = this._physicalBottom >= this._scrollBottom && this._physicalTop <= this._scrollPosition;
-        if (this._physicalSize >= this._optPhysicalSize && isClientHeightFull) {
+        if (this._physicalAverage * this._physicalSizes.length >= this._optPhysicalSize) {
           return false;
         }
+
+        console.log(this._physicalAverage * this._physicalSizes.length, this._optPhysicalSize);
         // this value should range between [0 <= `currentPage` <= `_maxPages`]
         var currentPage = Math.floor(this._physicalSize / this._viewportHeight);
         if (currentPage === 0) {
@@ -705,7 +707,10 @@
         // the scroll position being reset. Waiting 1ms fixes the issue.
         Polymer.dom.addDebouncer(this.debounce('_debounceTemplate', function() {
           this.updateViewportBoundaries();
-          this._render();
+
+          if (this._ready) {
+            // this._render();
+          }
 
           if (this._itemsRendered && this._physicalItems && this._isVisible) {
             this._resetAverage();
