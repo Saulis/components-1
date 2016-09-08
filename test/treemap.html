@@ -1,0 +1,125 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="helpers.html">
+  <link rel="import" href="../vaadin-grid.html">
+  <link rel="import" href="tree-map.html">
+</head>
+
+<body>
+
+  <script>
+    describe('tree', function() {
+      var tree, items;
+      beforeEach(function() {
+        tree = new TreeCache(0, 100);
+
+        items = Array(50).fill(0).map(function(item, index) {
+          return {value: 'foo' + index};
+        });
+      });
+
+      it('should', function() {
+        expect(tree.parent).to.eql(0);
+        expect(tree.size).to.eql(100);
+
+      });
+
+      it('should return undefined for non-cached item', function() {
+        expect(tree.getItem(0)).to.be.undefined;
+      });
+
+      it('should return cached item', function() {
+        tree.cache[0] = items;
+
+        expect(tree.getItem(0)).to.eql(items[0]);
+      });
+
+      it('should return cached item', function() {
+        tree.cache[1] = items;
+
+        expect(tree.getItem(50)).to.eql(items[0]);
+      });
+
+      it('should return nested cached item', function() {
+        tree.cache[0] = items;
+
+        tree.add(5, 10);
+        tree.getNestedTree(6).cache[0] = items;
+
+        expect(tree.getItem(6)).to.eql(items[0]);
+      });
+
+      it('should return correct item after nested items', function() {
+        tree.cache[0] = items;
+
+        tree.add(5, 5);
+        tree.getNestedTree(6).cache[0] = items;
+
+        // first item after nested
+        expect(tree.getItem(11)).to.eql(items[6]);
+      });
+
+      it('should return nesting level', function() {
+        tree.add(5, 10);
+        tree.add(6, 10);
+
+        expect(tree.getNestingLevel(5)).to.eql(0);
+        expect(tree.getNestingLevel(6)).to.eql(1);
+        expect(tree.getNestingLevel(7)).to.eql(2);
+      });
+
+      it('should return page', function() {
+        tree.add(5, 10);
+        tree.add(6, 60);
+
+        expect(tree.getPage(5)).to.eql(0);
+        expect(tree.getPage(6)).to.eql(0);
+        expect(tree.getPage(7)).to.eql(0);
+        expect(tree.getPage(57)).to.eql(1);
+      });
+
+      it('should return path', function() {
+        tree.add(5, 10);
+        tree.add(6, 10);
+
+        expect(tree.getPath(5)).to.eql('/');
+        expect(tree.getPath(6)).to.eql('/foo');
+        expect(tree.getPath(7)).to.eql('/bar');
+      });
+
+      it('should update size on dupe add', function() {
+        tree.add(5, 10);
+        tree.add(5, 20);
+
+        expect(tree.totalSize()).to.eql(120);
+      });
+
+      it('should remove nested tree', function() {
+        tree.add(5, 10);
+
+        tree.remove(5);
+
+        expect(tree.totalSize()).to.eql(100);
+      });
+
+      it('should return tree at index', function() {
+        tree.add(5, 10);
+
+        expect(tree.getTree(5)).to.eql(tree);
+        expect(tree.getTree(6)).to.eql(tree.trees[0]);
+      });
+    });
+  </script>
+
+</body>
+
+</html>
