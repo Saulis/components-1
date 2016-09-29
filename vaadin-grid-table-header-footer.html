@@ -7,24 +7,39 @@
         _rows: Array
       },
 
-      observers: ['_columnsChanged(columns.*, frozenColumns)', '_rowsChanged(_rows)'],
+      observers: ['_columnsChanged(columns, frozenColumns)', '_rowsChanged(_rows)'],
 
-      _columnsChanged: function(e) {
-        if (e.path === 'columns') {
-          this._rows = Array.apply(null, Array(this._rowCount(e.value))).map(function(item, index) {
-            var row = this._createRow();
-            row.rowIndex = index;
-            row.frozenColumns = this.frozenColumns;
-            row.target = this.domHost.domHost;
-            row.columns = e.value;
+      _childColumns: function(columns) {
+        return columns.map(function(col) {
+          return col.childColumns || [col];
+        }).reduce(function(prev, curr) {
+          return prev.concat(curr);
+        }, []);
+      },
 
-            return row;
-          }.bind(this));
-        } else if (e.path.indexOf('columns.#') === 0) {
-          this._rows.forEach(function(row) {
-            row.notifyPath(e.path, e.value);
-          });
-        }
+      _hasChildColumns: function(columns) {
+        return columns.filter(function(col) {
+          return col.childColumns;
+        }).length > 0;
+      },
+
+      _columnsChanged: function(columns) {
+        //TODO: should always be vaadin-grid. using domHost.domHost isn't
+        // fully waterproof in case columns come via <content> elements.
+        var target = this.domHost.domHost;
+
+        var rows = [];
+
+        do {
+          var row = this._createRow();
+          row.target = target;
+          row._groupRow = this._hasChildColumns(columns);
+          row.columns = columns;
+          rows.push(row);
+        } while (this._hasChildColumns(columns) && (columns = this._childColumns(columns)));
+
+        rows[rows.length - 1].lastRow = true;
+        this._rows = this.is === 'vaadin-grid-table-header' ? rows : rows.reverse();
       },
 
       _rowsChanged: function(rows) {
@@ -43,12 +58,6 @@
 
       _createRow: function() {
         return document.createElement('tr', 'vaadin-grid-table-header-row');
-      },
-
-      _rowCount: function(columns) {
-        return Math.max.apply(Math, columns.map(function(column) {
-          return Polymer.dom(column).querySelectorAll('[is="header"]').length;
-        }));
       }
     });
 
@@ -59,12 +68,6 @@
 
       _createRow: function() {
         return document.createElement('tr', 'vaadin-grid-table-footer-row');
-      },
-
-      _rowCount: function(columns) {
-        return Math.max.apply(Math, columns.map(function(column) {
-          return Polymer.dom(column).querySelectorAll('[is="footer"]').length;
-        }));
       }
     });
   })();

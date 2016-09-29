@@ -1,0 +1,97 @@
+<dom-module id="vaadin-grid-column-group">
+  <script>
+    Polymer({
+      is: 'vaadin-grid-column-group',
+
+      properties: {
+        // TODO: needs a light dom observer
+        childColumns: {
+          value: function() {
+            return Polymer.dom(this).children.filter(function(el) {
+              return el.localName.indexOf('vaadin-grid-column') === 0;
+            });
+          }
+        },
+        flex: Number,
+        footerTemplate: {
+          type: Object,
+          value: function() {
+            return this._findTemplate('footer');
+          }
+        },
+        headerTemplate: {
+          type: Object,
+          value: function() {
+            return this._findTemplate('header');
+          }
+        },
+
+        width: String
+      },
+
+      observers: [
+                  '_childColumnsChanged(childColumns)',
+                  '_flexChanged(flex)',
+                  '_footerTemplateChanged(footerTemplate)',
+                  '_headerTemplateChanged(headerTemplate)',
+                  '_widthChanged(width)'],
+
+      listeners: {
+        'column-changed': '_columnPropChanged'
+      },
+
+      _findTemplate: function(type) {
+        var template = Polymer.dom(this).children.filter(function(el) {
+          return el.localName === 'template' && el.getAttribute('is') === type;
+        })[0];
+        if(template) {
+          if(this.dataHost) {
+            // set dataHost to the context where template has been defined
+            template._rootDataHost = this.dataHost._rootDataHost || this.dataHost;
+          }
+
+          return template;
+        }
+      },
+
+      _columnPropChanged: function(e) {
+        if (e.target !== this && e.detail.path !== 'childColumns') {
+          // stop child column events from bubbling up to the listener of this group.
+          // unless it's a 'childColumns' event, when we do need to propagate them to the grid.
+          // alternatively, we could fire a new event for path 'childColumns'.
+          e.stopImmediatePropagation();
+        }
+
+        if (e.detail.path.match(/flex|width|childColumns/)) {
+          this.width = 'calc(' + this.childColumns.reduce(function(prev, curr) {
+            return prev += ' + ' + (curr.width || '0');
+          }, '').substring(3) + ')';
+
+          this.flex = this.childColumns.reduce(function(prev, curr) {
+            return prev + curr.flex;
+          }, 0);
+        }
+      },
+
+      _footerTemplateChanged: function(template) {
+        this.fire('column-changed', {path: 'footerTemplate', value: template});
+      },
+
+      _headerTemplateChanged: function(template) {
+        this.fire('column-changed', {path: 'headerTemplate', value: template});
+      },
+
+      _childColumnsChanged: function(childColumns) {
+        this.fire('column-changed', {path: 'childColumns', value: childColumns});
+      },
+
+      _flexChanged: function(flex) {
+        this.fire('column-changed', {path: 'flex', value: flex});
+      },
+
+      _widthChanged: function(width) {
+        this.fire('column-changed', {path: 'width', value: width});
+      }
+    });
+  </script>
+</dom-module>

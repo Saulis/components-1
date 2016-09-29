@@ -198,10 +198,9 @@
     },
 
     observers: [
-      '_columnsChanged(columns.*, frozenColumns, _physicalItems)',
+      '_columnsChanged(columns, frozenColumns, _physicalItems, _physicalCount)',
       '_sizeChanged(size, bindData)',
-      '_rowDetailsTemplateChanged(rowDetailsTemplate, _physicalItems, _physicalCount)',
-      '_physicalItemsChanged(_physicalCount, columns, frozenColumns)'
+      '_rowDetailsTemplateChanged(rowDetailsTemplate, _physicalItems, _physicalCount)'
     ],
 
     // The following values aim at avoiding having 2 overlapping semi-invisible
@@ -223,31 +222,40 @@
       });
     },
 
-    _columnsChanged: function(e, frozenColumns, physicalItems) {
-      if (e.path === 'columns') {
-        physicalItems.forEach(function(row) {
-          row.columns = e.value;
-          row.frozenColumns = frozenColumns;
+    _childColumns: function(columns) {
+      var childColumns = function(col) {
+        return Polymer.dom(col).children.filter(function(el) {
+          return el.localName.indexOf('vaadin-grid-column') === 0;
         });
-      } else if (e.path.indexOf('columns.#' === 0)) {
-        physicalItems.forEach(function(row) {
-          row.notifyPath(e.path, e.value);
-        });
+      };
+
+      var hasChildren = function(col) {
+        return childColumns(col).length > 0;
+      };
+
+      while(columns.filter(hasChildren).length > 0) {
+        columns = columns.map(function(col) {
+          return hasChildren(col) ? childColumns(col) : col;
+        }).reduce(function(prev, curr) {
+          return prev.concat(curr);
+        }, []);
       }
+
+      return columns;
+    },
+
+    _columnsChanged: function(columns, frozenColumns, physicalItems, count) {
+      columns = this._childColumns(columns);
+
+      physicalItems.forEach(function(row) {
+        row.columns = columns;
+        row.frozenColumns = frozenColumns;
+      }.bind(this));
 
       Polymer.RenderStatus.afterNextRender(this.$.header, function() {
         this.$.outerscroller.style.paddingTop = this.$.items.style.borderTopWidth = this.$.header.clientHeight + 'px';
         this.$.outerscroller.style.paddingBottom = this.$.items.style.borderBottomWidth = this.$.footer.clientHeight + 'px';
       }.bind(this));
-    },
-
-    _physicalItemsChanged: function(count, columns, frozenColumns) {
-      // observing _physicalCount instead of _physicalItems.length because grid
-      // seems to startup somewhat faster without using this.push('_physicalItems')...
-      this._physicalItems.forEach(function(row) {
-        row.columns = columns;
-        row.frozenColumns = frozenColumns;
-      });
     },
 
     /**
