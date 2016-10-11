@@ -126,6 +126,7 @@
       .empty {
         /*height: 0px;*/
         border: none;
+        background: pink !important;
       }
 
       [last-frozen] {
@@ -232,8 +233,8 @@
     },
 
     _columnsChanged: function(e, frozenColumns, physicalItems) {
-      if (e.path === 'columns') {
-        this._configureItems(this._physicalCount, e.value, frozenColumns);
+      if (e.path === 'columns' || /frozen/.test(e.path)) {
+        this._configureItems(this._physicalCount, this.columns, frozenColumns);
       } else if (e.path.indexOf('columns.#' === 0)) {
         physicalItems.forEach(function(row) {
           row.notifyPath(e.path, e.value);
@@ -246,16 +247,35 @@
       }.bind(this));
     },
 
-    _configureItems: function(count, columns, frozenColumns) {
-      // Body shows only columns, not groups
+    _configureItems: function(count, columns) {
+
+
+      // Discarding groups since body shows only columns.
       var itemColumns = columns.filter(function(col) {
         // Not using `is` because at this point columns might not be registered.
         return col.tagName.toLowerCase() == 'vaadin-grid-column';
       });
+
+      // Consolidate frozen attributes. If a column in a group is marked as frozen, mark all siblings.
+      columns.forEach(function(col) {
+        var frozen = col.getAttribute('frozen') != null || !!Polymer.dom(col).querySelector('[frozen]');
+        if (frozen) {
+          Polymer.dom(col).querySelectorAll('vaadin-grid-column').forEach(function(child) {
+            child.toggleAttribute('frozen', true);
+          });
+        }
+      });
+      // We only support frozen columns at the left, so latest frozen column makes
+      // everything at left be frozen.
+      this.frozenColumns = Math.max.apply(Math, itemColumns.map(function(col, idx) {
+        return col.getAttribute('frozen') != null ? idx + 1 : 0;
+      }));
+
+      // Configure body items.
       this._physicalItems.forEach(function(row) {
         row.columns = itemColumns;
-        row.frozenColumns = frozenColumns;
-      });
+        row.frozenColumns = this.frozenColumns;
+      }.bind(this));
     },
 
     /**
