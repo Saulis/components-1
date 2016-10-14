@@ -26,8 +26,7 @@
     },
 
     _arrayDataSource: function(opts, cb) {
-      var items = this.items.slice(0) || [];
-
+      var items = (this.items || []).slice(0);
       items.sort(this._multiSort.bind(this));
 
       var start = opts.page * opts.pageSize;

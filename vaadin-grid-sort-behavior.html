@@ -1,3 +1,5 @@
+<link rel="import" href="vaadin-grid-table-cell.html">
+
 <dom-module id="vaadin-grid-sorter">
   <template>
     <style>
@@ -26,20 +28,24 @@
 
       properties: {
 
-        _grid: Object,
-
-        _cell: Object,
+        grid: Object,
 
         path: String,
 
         direction: String,
 
-        order: Number
+        order: Number,
+
+        _initialOrder: Number
 
       },
 
       observers: [
-        '_parametersChanged(_grid, path, direction)'
+        '_parametersChanged(grid, path, direction)'
+      ],
+
+      behaviors: [
+        vaadin.elements.grid.NonFocusableClickBehavior
       ],
 
       ready: function() {
@@ -47,17 +53,11 @@
       },
 
       attached: function() {
-        this._grid = this._getAncestor('vaadin-grid', this.parentNode);
-        this._cell = this._getAncestor('th, td', this.parentNode);
-        this.listen(this._cell, 'cell-click', '_onClick');
-      },
-
-      detached: function() {
-        this.unlisten(this._cell, 'cell-click', '_onClick');
+        this.grid = this.grid || this._getAncestor('vaadin-grid', this.parentNode);
       },
 
       _parametersChanged: function(grid, path, direction) {
-        var sorters = this._grid._sorters;
+        var sorters = this.grid._sorters;
 
         if (this._initialOrder !== undefined) {
           sorters.push(this);
@@ -92,11 +92,10 @@
         }
       },
 
-      _onClick: function(e) {
+      _nonFocusableClick: function(e) {
         if (Polymer.dom(e).path.indexOf(this) === -1) {
           //TODO: Should not invoke when the sorter isn't clicked (but some other element in the cell)
         }
-
 
         if (this.direction === 'desc') {
           this.direction = 'asc';
