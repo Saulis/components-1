@@ -163,6 +163,72 @@
         vaadinGridTableRowBehavior
       ],
 
+      listeners: {
+        'dragstart': '_onDragstart',
+        'dragover' : '_onDragover',
+        'dragleave' : '_onDragexit',
+        'dragenter': '_onDragenter',
+        // 'dragend': '_onDragend',
+        'drop': '_onDrop'
+      },
+
+      created: function() {
+        this.setAttribute('draggable', 'true');
+      },
+
+      _onDragstart: function(e) {
+        // debugger;
+        var item = this.cells[0].instance.item;
+        window.foo = {item: item};
+      },
+
+      _onDrop: function(e) {
+        // var item = JSON.parse(e.dataTransfer.getData('foo'));
+        var item = window.foo.item;
+        var index = this.cells[0].instance.index;
+        var grid = Polymer.dom(this).parentNode.parentNode.parentNode.parentNode;
+
+        var index2 = grid.items.indexOf(item);
+        console.log(index, index2);
+        if (index > index2) {
+          grid.splice('items', index, 0, item);
+          grid.splice('items', index2, 1);
+        }
+
+        console.log(grid.items[0]);
+        // console.log(item, grid.items.indexOf(item));
+
+
+        // debugger;
+        this.toggleClass('dragging', false);
+      },
+
+      _onDragend: function(e) {
+        // debugger;
+        var index = this.cells[0].instance.index;
+        var grid = Polymer.dom(this).parentNode.parentNode.parentNode.parentNode;
+        var item = e.dataTransfer.getData('foo');
+
+        console.log(item);
+        // console.log('dropped on: ', this._cells[0].in);
+      },
+
+      _onDragover: function(e) {
+        // e.stopPropagation();
+        e.preventDefault();
+        // e.dataTransfer.dropEffect = 'copy';
+        this.toggleClass('dragging', true);
+      },
+
+      _onDragenter: function(e) {
+        // e.preventDefault();
+      },
+
+      _onDragexit: function(e) {
+        // e.preventDefault();
+        this.toggleClass('dragging', false);
+      },
+
       _createCell: function() {
         return document.createElement('td', 'vaadin-grid-table-cell');
       }
