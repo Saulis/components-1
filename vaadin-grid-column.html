@@ -106,16 +106,98 @@
 
         hidden: {
           type: Boolean
+        },
+
+        _forwardedParentProps: {
+          value: function() {
+            return {};
+          }
+        },
+
+        _templateInstances: Array
+      },
+
+      observers: ['_flexChanged(flex)', '_widthChanged(width)', '_templateChanged(template)', '_frozenChanged(frozen)', '_hiddenChanged(hidden)',
+                  '_forwardedParentPropsChanged(_forwardedParentProps.*, _templateInstances)'],
+
+      created: function() {
+        this._instanceProps = {
+          expanded: true,
+          index: true,
+          item: true,
+          selected: true
+        };
+      },
+
+      _forwardInstanceProp: function(inst, prop, value) {
+        // fire notification event only when a prop is changed through a user-action.
+        // e.g. 'expanded' is different from the originally bound '__expanded__' value.
+        if (inst['__' + prop + '__'] !== undefined &&
+            inst['__' + prop + '__'] !== value) {
+          this.fire('template-instance-changed', {
+            prop: prop,
+            value: value,
+            inst: inst
+          });
         }
       },
 
-      observers: ['_flexChanged(flex)', '_widthChanged(width)', '_templateChanged(template)', '_frozenChanged(frozen)', '_hiddenChanged(hidden)'],
+      _forwardInstancePath: function(inst, path, value) {
+        // TODO: assuming we're currently just listening to [[item.xxxx]] properties
+        // which affect only cells on the current row.
+        if (path.indexOf('item.') === 0) {
+          // this.parentElement.iterateCells(function(cell) {
+          //   if (cell.instance) {
+          //     cell.instance.notifyPath(path, value);
+          //   }
+          // });
+
+          this.fire('item-changed', {
+            item: inst.item,
+            // stripping 'item.' from path.
+            path: path.substring(5),
+            value: value
+          });
+
+          // instance.notifyPath above will call _forwardInstancePath recursively,
+          // so need to debounce to avoid firing the same event multiple times.
+          // this.parentElement.debounce('item-changed', function() {
+          // }.bind(this));
+        }
+      },
+
+      _forwardParentProp: function(prop, value) {
+        // _forwardParentProp might be called during this.stamp() before
+        // this.instance is set. We need to delay it until instance is set.
+        this.set('_forwardedParentProps.' + prop, value);
+      },
+
+      _forwardParentPath: function(path, value) {
+        this.set('_forwardedParentProps.' + path, value);
+      },
+
+      _forwardedParentPropsChanged: function(e, templateInstances) {
+        if (e.path !== '_forwardedParentProps') {
+          var prop = e.path.substring(e.path.indexOf('.') + 1);
+          var value = e.value;
+
+          templateInstances.forEach(function(inst) {
+            inst.notifyPath(prop, value);
+          });
+        }
+      },
 
       _frozenChanged: function(frozen) {
         this.fire('property-changed', {path: 'frozen', value: frozen});
       },
 
       _templateChanged: function(template) {
+        this._templateInstances = [];
+        this.templatize(template);
+
+        // TODO: hack to avoid: https://github.com/Polymer/polymer/issues/3307
+        this._parentProps = this._parentProps || {};
+
         // We bubble false for optimisation
         this.fire('property-changed', {path: 'template', value: template}, {bubbles: false});
       },
@@ -139,7 +221,7 @@
     Polymer({
       is: 'vaadin-grid-column',
 
-      behaviors: [vaadin.elements.grid.vaadinGridColumnBehavior]
+      behaviors: [Polymer.Templatizer, vaadin.elements.grid.vaadinGridColumnBehavior]
     });
 
     Polymer({

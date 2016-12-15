@@ -65,6 +65,10 @@
    */
   vaadin.elements.grid.DataSourceBehavior = {
 
+    listeners: {
+      'item-changed': '_templateItemChanged'
+    },
+
     properties: {
 
       /**
@@ -101,6 +105,22 @@
           return {};
         }
       },
+    },
+
+    _templateItemChanged: function(e) {
+      var item = e.detail.item;
+
+      // TODO: instead of iterating through all the rows, there should an index -> row mapping
+      // inside the scroller?
+      for(var i=0;i < this.$.scroller.$.items.rows.length; i++) {
+        var row = this.$.scroller.$.items.rows[i];
+        if (row.item === item) {
+          for(var j=0;j < row.cells.length;j++) {
+            var cell = row.cells[j];
+            cell.instance.notifyPath('item.' + e.detail.path, e.detail.value);
+          }
+        }
+      }
     },
 
     _getCachedItem: function(index) {
