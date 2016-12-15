@@ -8,6 +8,7 @@
 <link rel="import" href="vaadin-grid-selection-behavior.html">
 <link rel="import" href="vaadin-grid-sort-behavior.html">
 <link rel="import" href="vaadin-grid-filter-behavior.html">
+<link rel="import" href="vaadin-grid-templatizer-behavior.html">
 
 <dom-module id="vaadin-grid">
   <style>
@@ -64,7 +65,8 @@
       vaadin.elements.grid.ArrayDataSourceBehavior,
       vaadin.elements.grid.SelectionBehavior,
       vaadin.elements.grid.SortBehavior,
-      vaadin.elements.grid.FilterBehavior
+      vaadin.elements.grid.FilterBehavior,
+      vaadin.elements.grid.TemplatizerBehavior
     ],
 
     listeners: {
@@ -84,7 +86,7 @@
 
     ready: function() {
       this._updateColumnTree();
-      this.rowDetailsTemplate = Polymer.dom(this).querySelector('template.row-details');
+      this.rowDetailsTemplate = Polymer.dom(this).querySelector('template.row-details') || undefined;
     },
 
     _columnPropChanged: function(e) {

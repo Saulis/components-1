@@ -188,6 +188,43 @@
       </template>
       <x-grid></x-grid>
     </demo-snippet>
+
+    <demo-snippet>
+      <h3>Dynamic Columns using dom-repeat</h3>
+      <template>
+        <x-dynamic-columns></x-dynamic-columns>
+        <dom-module id="x-dynamic-columns">
+          <template>
+            <x-data-source data-source="{{dataSource}}"></x-data-source>
+            <vaadin-grid id="grid" data-source="[[dataSource]]" size="200">
+              <template is="dom-repeat" items="[[columns]]" as="column">
+                <vaadin-grid-column>
+                  <template class="header">[[column]]</template>
+                  <template>[[_itemProperty(item, column)]]</template>
+                </vaadin-grid-column>
+              </template>
+            </vaadin-grid>
+          </template>
+          <script>
+            Polymer({
+              is: 'x-dynamic-columns',
+
+              properties: {
+                columns: Array
+              },
+
+              ready: function() {
+                this.columns = ['name.first', 'name.last', 'email'];
+              },
+
+              _itemProperty: function(item, column) {
+                return this.get('user.' + column, item);
+              }
+            });
+          </script>
+        </dom-module>
+      </template>
+    </demo-snippet>
   </div>
 </body>
 

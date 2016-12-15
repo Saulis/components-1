@@ -39,7 +39,8 @@
     },
 
     observers: [
-      '_expandedItemsChanged(expandedItems.*, dataSource)'
+      '_expandedItemsChanged(expandedItems.*, dataSource)',
+      '_rowDetailsTemplateChanged(rowDetailsTemplate)'
     ],
 
     _expandedItemsChanged: function(expandedItems, dataSource) {
@@ -47,6 +48,18 @@
       this.$.scroller._physicalItems.forEach(function(row) {
         row.expanded = this._isExpanded(row.item);
       }.bind(this));
+    },
+
+    _rowDetailsTemplateChanged: function(rowDetailsTemplate) {
+      this._instanceProps = {
+        expanded: true,
+        item: true,
+        selected: true
+      };
+
+      this._templateInstances = [];
+      this._forwardedParentProps = {};
+      this.templatize(rowDetailsTemplate);
     },
 
     _isExpanded: function(item) {
