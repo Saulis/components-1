@@ -40,6 +40,7 @@
     },
 
     listeners: {
+      'blur': '_onBlur',
       'cell-focus': '_onCellFocus',
       'cell-content-focus': '_onCellContentFocus'
     },
@@ -211,6 +212,10 @@
 
         this.fire('cell-activate', {model: this._virtualFocus._focusedCell.instance});
       }
+    },
+
+    _onBlur: function(e) {
+      this._navigating = false;
     },
 
     _onCellContentFocus: function(e) {
