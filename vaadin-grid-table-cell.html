@@ -182,6 +182,10 @@
 
       extends: 'td',
 
+      hostAttributes: {
+        'aria-role': 'gridcell'
+      },
+
       behaviors: [
         vaadinGridTableCellBehavior,
         vaadin.elements.grid.CellClickBehavior
@@ -200,6 +204,10 @@
       is: 'vaadin-grid-table-header-cell',
 
       extends: 'th',
+
+      hostAttributes: {
+        'aria-role': 'columnheader'
+      },
 
       properties: {
         headerTemplate: Object

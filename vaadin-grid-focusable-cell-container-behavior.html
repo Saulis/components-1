@@ -1,3 +1,5 @@
+<link rel="import" href="../iron-a11y-announcer/iron-a11y-announcer.html">
+
 <script>
   window.vaadin = window.vaadin || {};
   vaadin.elements = vaadin.elements || {};
@@ -20,6 +22,10 @@
 
     observers: ['_focusedCellChanged(_focusedRowIndex, _focusedCellIndex)'],
 
+    attached: function() {
+      Polymer.IronA11yAnnouncer.requestAvailability();
+    },
+
     _focusedCellChanged: function(rowIndex, cellIndex) {
       Polymer.dom(this).children.forEach(function(row, i) {
         row.focused = i === rowIndex;
@@ -34,6 +40,10 @@
           cell.focused = j === this._focusedCellIndex;
         }.bind(this));
       }.bind(this));
+
+      this.fire('iron-announce', {
+        text: this._focusedCell.textContent
+      });
     },
 
     focusLeft: function() {
