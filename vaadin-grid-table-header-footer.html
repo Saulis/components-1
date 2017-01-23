@@ -79,6 +79,13 @@
             cell.focused = idx === cellIndex;
           });
         }.bind(this));
+
+        this.debounce('announce', function() {
+          console.log('announce', this._focusedCell.textContent);
+          this.fire('iron-announce', {
+            text: this._focusedCell.textContent
+          });
+        }, 100);
       }
     });
 
