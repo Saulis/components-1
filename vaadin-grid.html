@@ -141,6 +141,11 @@ first element in the cell will be focused. You can override the behavior by appl
   Polymer({
     is: 'vaadin-grid',
 
+    hostAttributes: {
+      'tabindex': 0,
+      // 'role': 'grid'
+    },
+
     properties: {
 
       _columnTree: {

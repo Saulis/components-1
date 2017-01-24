@@ -437,6 +437,7 @@
       if (this.interacting) {
         this.interacting = false;
         this._onTab(e); // revert to navigation
+        this.domHost.focus();
       } else if (this.navigating) {
         this.domHost.focus();
       }
