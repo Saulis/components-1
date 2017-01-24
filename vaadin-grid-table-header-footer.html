@@ -73,6 +73,13 @@
           if (row.index === rowIndex) {
             this._focusedRow = row;
             this._focusedCell = row.children[cellIndex];
+            this._focusedCell.focus();
+            // console.log(this._focusedCell.id);
+            // this.domHost.$.bodyFocusTrap.setAttribute('aria-owns', this._focusedCell.id);
+            // this.domHost.domHost.focus();
+            console.log(document.activeElement);
+            this.domHost.$.bodyFocusTrap.setAttribute('aria-activedescendant', this._focusedCell.id);
+            // this.domHost.domHost.setAttribute('aria-activedescendant', this._focusedCell.id);
           }
 
           row.cells.forEach(function(cell, idx) {
@@ -80,12 +87,12 @@
           });
         }.bind(this));
 
-        this.debounce('announce', function() {
-          console.log('announce', this._focusedCell.textContent);
-          this.fire('iron-announce', {
-            text: this._focusedCell.textContent
-          });
-        }, 100);
+        // this.debounce('announce', function() {
+        //   console.log('announce', this._focusedCell.textContent);
+        //   this.fire('iron-announce', {
+        //     text: this._focusedCell.textContent
+        //   });
+        // }, 100);
       }
     });
 

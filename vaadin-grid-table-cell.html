@@ -168,8 +168,12 @@
 
         this._cellContent = document.createElement('div');
         this._cellContent.setAttribute('class', 'cell-content');
-        var contentId = target._contentIndex = target._contentIndex + 1 || 0;
+        window.foobar = window.foobar || {};
+        var contentId = window.foobar._contentIndex = window.foobar._contentIndex + 1 || 0;
         this._cellContent.setAttribute('data-cell-content-id', contentId);
+        // this._cellContent.id = ('aria-id-' + contentId);
+        this.id = ('aria-id-' + contentId);
+        // this._cellContent.setAttribute('role', 'gridcell');
         Polymer.dom(this._cellContent).appendChild(this.instance.root);
 
         this._insertionPoint = document.createElement('content');
@@ -183,7 +187,8 @@
       extends: 'td',
 
       hostAttributes: {
-        'aria-role': 'gridcell'
+        // 'tabindex': -1,
+        // 'aria-role': 'gridcell'
       },
 
       behaviors: [
