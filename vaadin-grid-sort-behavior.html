@@ -32,6 +32,10 @@ Custom property | Description | Default
         cursor: pointer;
       }
 
+      :host(:focus) {
+        /*outline: none;*/
+      }
+
       #indicators {
         position: relative;
       }
@@ -71,6 +75,11 @@ Custom property | Description | Default
     Polymer({
       is: 'vaadin-grid-sorter',
 
+      hostAttributes: {
+        'tabindex': 0,
+        'role': 'button'
+      },
+
       properties: {
 
         /**
@@ -102,6 +111,11 @@ Custom property | Description | Default
         vaadin.elements.grid.CellClickBehavior
       ],
 
+      listeners: {
+        'click': '_cellClick',
+        'keydown': '_onKeydown'
+      },
+
       _propertiesChanged: function(path, direction, isAttached) {
         if (isAttached) {
           this.fire('sorter-changed');
@@ -119,6 +133,18 @@ Custom property | Description | Default
           this.direction = null;
         } else {
           this.direction = 'asc';
+        }
+
+        this.fire('iron-announce', {
+          text: this.direction
+        });
+      },
+
+      _onKeydown: function(e) {
+        // enter or space
+        if (e.keyCode === 13 || e.keyCode === 32) {
+          e.preventDefault();
+          this._cellClick();
         }
       }
 

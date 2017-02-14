@@ -16,7 +16,7 @@
       this._cellContentFocusHandler = function(e) {
         // IE11 fires `focus` events for the cell content element even when nothing
         // focusable was clicked.
-        if (e.target !== this._cellContent) {
+        if (e.target !== this._cellContent && this.localName !== 'vaadin-grid-sorter') {
           this.fire('cell-content-focus', {cell: this});
         }
       }.bind(this);
