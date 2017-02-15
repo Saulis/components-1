@@ -164,6 +164,10 @@
         display: none;
       }
 
+      :host([no-content-pointer-events]) .vaadin-grid-cell ::content > .cell-content {
+        pointer-events: none;
+      }
+
       /* Style overrides required to make copying the selection to clipboard work properly (on Safari) */
       :host([copying]) tr {
         opacity: 0 !important;
@@ -295,6 +299,8 @@
         scrolling$="[[scrolling]]">
       <div id="outersizer" is="vaadin-grid-sizer" top="[[_estScrollHeight]]" column-tree="[[columnTree]]"></div>
     </vaadin-grid-table-outer-scroller>
+
+    <content select=".vaadin-grid-reorder-ghost" id="ghost-selector"></content>
 
     <!--
       in native Shadow, we move the footer focus trap to light DOM.
