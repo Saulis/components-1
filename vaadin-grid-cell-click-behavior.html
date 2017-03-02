@@ -36,7 +36,6 @@
     _onClick: function(e) {
       // this event is only supposed to be fired from cells.
       if (this.localName !== 'vaadin-grid-sorter') {
-        var container = this.parentElement.parentElement;
         this.fire('cell-focus', {cell: this});
       }
 
