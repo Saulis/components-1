@@ -45,7 +45,9 @@
             <vaadin-grid-column-group>
               <template class="header">[[colgroup]]</template>
               <template class="footer">[[colgroup]]</template>
-              <dom-repeat items="[1, 2]" as="col">
+              <!-- For some weird reason <template is="dom-repeat"> works inside a template,
+                   but <dom-repeat>, not so much -->
+              <!--<dom-repeat items="[1, 2]" as="col">-->
                 <template is="dom-repeat" items="[1, 2]" as="col">
                   <vaadin-grid-column>
                     <template class="header">[[colgroup]][[col]]</template>
@@ -53,7 +55,7 @@
                     <template class="footer">[[colgroup]][[col]]</template>
                   </vaadin-grid-column>
                 </template>
-              </dom-repeat>
+              <!--</dom-repeat>-->
             </vaadin-grid-column-group>
           </template>
         </dom-repeat>
