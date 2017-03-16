@@ -118,6 +118,14 @@
 
     _forwardHostPropV2: function(prop, value) {
       this._forwardParentProp(prop, value);
+
+      // TODO: _forwardedParentPropsChanged isn't triggered for some reason in
+      // all cases in Hybrid mode. Try removing this after running pure P2.
+      if (this._templateInstances) {
+        this._templateInstances.forEach(function(inst) {
+            inst.notifyPath(prop, value);
+        });
+      }
     },
 
     _forwardedParentPropsChanged: function(e, templateInstances) {
