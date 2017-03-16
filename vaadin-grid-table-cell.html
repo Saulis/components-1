@@ -514,6 +514,10 @@
       observers: ['_footerTemplateChanged(footerTemplate, isAttached)'],
 
       _footerTemplateChanged: function(footerTemplate, isAttached) {
+        if (footerTemplate === undefined || isAttached === undefined) {
+          return;
+        }
+
         if (footerTemplate !== null && (this._isColumnRow || this.column.localName === 'vaadin-grid-column-group')) {
           this._isEmpty = false;
           this.instance = this.instance || footerTemplate.templatizer.createInstance();
