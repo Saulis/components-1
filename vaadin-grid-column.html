@@ -54,17 +54,7 @@ The `class` attribute is used to differentiate header and footer templates from 
       headerTemplate: {
         type: Object,
         value: function() {
-          var template = this._findTemplate('template.header') || null;
-
-          if (template) {
-            var templatizer = new vaadin.elements.grid.Templatizer();
-            templatizer.dataHost = this.dataHost;
-            templatizer._instanceProps = {};
-            templatizer.template = template;
-            template.templatizer = templatizer;
-          }
-
-          return template;
+          return this._prepareTemplatizer(this._findTemplate('template.header') || null, {});
         }
       },
 
@@ -74,17 +64,7 @@ The `class` attribute is used to differentiate header and footer templates from 
       footerTemplate: {
         type: Object,
         value: function() {
-          var template = this._findTemplate('template.footer') || null;
-
-          if (template) {
-            var templatizer = new vaadin.elements.grid.Templatizer();
-            templatizer.dataHost = this.dataHost;
-            templatizer._instanceProps = {};
-            templatizer.template = template;
-            template.templatizer = templatizer;
-          }
-
-          return template;
+          return this._prepareTemplatizer(this._findTemplate('template.footer') || null, {});
         }
       },
 
@@ -122,6 +102,18 @@ The `class` attribute is used to differentiate header and footer templates from 
       '_headerTemplateChanged(headerTemplate)',
       '_lastFrozenChanged(_lastFrozen)'
     ],
+
+    _prepareTemplatizer: function(template, instanceProps) {
+      if (template) {
+        var templatizer = new vaadin.elements.grid.Templatizer();
+        templatizer.dataHost = this.dataHost;
+        templatizer._instanceProps = instanceProps || templatizer._instanceProps;
+        templatizer.template = template;
+        template.templatizer = templatizer;
+      }
+
+      return template;
+    },
 
     _selectFirstTemplate: function(selector) {
       return Array.prototype.filter.call(Polymer.dom(this).querySelectorAll(selector), function(el) {
@@ -200,16 +192,7 @@ The `class` attribute is used to differentiate header and footer templates from 
       template: {
         type: Object,
         value: function() {
-          var template = this._findTemplate('template:not(.header):not(.footer)');
-
-          if (template) {
-            var templatizer = new vaadin.elements.grid.Templatizer();
-            templatizer.dataHost = this.datahost;
-            templatizer.template = template;
-            template.templatizer = templatizer;
-          }
-
-          return template;
+          return this._prepareTemplatizer(this._findTemplate('template:not(.header):not(.footer)'));
         }
       },
 
@@ -252,7 +235,7 @@ The `class` attribute is used to differentiate header and footer templates from 
 
       // templatizer.template = template;
 
-      // We bubble false for optimisation
+      // don't bubble for optimisation
       this.fire('property-changed', {path: 'template', value: template}, {bubbles: false});
     },
 

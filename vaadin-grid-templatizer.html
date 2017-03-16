@@ -23,7 +23,12 @@
 
       _templatized: Boolean,
       _forwardedParentProps: Object,
-      _templateInstances: Array
+      _templateInstances: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      }
     },
 
     observers: ['_forwardedParentPropsChanged(_forwardedParentProps.*, _templateInstances)'],
@@ -66,7 +71,6 @@
       // TODO V2 only property?
       if (!this.template.__templatizeOwner) {
         this._forwardedParentProps = {};
-        this._templateInstances = [];
         this.templatize(this.template);
 
         // TODO: hack to avoid: https://github.com/Polymer/polymer/issues/3307

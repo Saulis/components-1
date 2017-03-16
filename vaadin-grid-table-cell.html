@@ -479,7 +479,7 @@
       },
 
       _headerTemplateChanged: function(headerTemplate, isAttached) {
-        if (isAttached === undefined) {
+        if (headerTemplate === undefined || isAttached === undefined) {
           return;
         }
 
