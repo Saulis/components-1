@@ -305,7 +305,6 @@
       }
       this.debounce('vaadin-grid-scrolling', function() {
         this.scrolling = false;
-        this._reorderRows();
       }, 100);
     },
 
@@ -358,28 +357,6 @@
           this._noScale = true;
         }
 
-      }
-    },
-
-    _reorderRows: function() {
-      var body = Polymer.dom(this.$.items);
-      var items = body.querySelectorAll('.vaadin-grid-row');
-      var _adjustedVirtualStart = this._virtualStart + this._vidxOffset;
-
-      // DOM index of the element with the lowest index
-      var physicalIndexOfFirst = items.length - (items[0].index - _adjustedVirtualStart);
-
-      // Reorder the DOM elements
-      if (physicalIndexOfFirst < items.length / 2) {
-        // Append all the preceding elements after the last element
-        for (var i = 0; i < physicalIndexOfFirst; i++) {
-          body.appendChild(items[i]);
-        }
-      } else {
-        // Prepend all the trailing elements before the first element
-        for (var j = physicalIndexOfFirst; j < items.length; j++) {
-          body.insertBefore(items[j], items[0]);
-        }
       }
     },
 

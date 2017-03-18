@@ -75,6 +75,7 @@
       ],
 
       ready: function() {
+        this.style.height = '30px';
         this.classList.add('vaadin-grid-cell');
 
         if (Polymer.Settings.useShadow === false) {
@@ -175,8 +176,12 @@
           if (Polymer.dom(cellContent).parentNode !== this.target) {
             Polymer.dom(this.target).appendChild(cellContent);
           }
-          Polymer.dom(this).appendChild(insertionPoint);
-          Polymer.dom(this.target.$.scroller).insertBefore(scrollerInsertionPoint, Polymer.dom(this.target.$.scroller).firstElementChild);
+          Polymer.RenderStatus.afterNextRender(this, function () {
+
+            this.style.height = '';
+            Polymer.dom(this).appendChild(insertionPoint);
+            Polymer.dom(this.target.$.scroller).insertBefore(scrollerInsertionPoint, Polymer.dom(this.target.$.scroller).firstElementChild);
+          });
         } else {
           this.async(function() {
             if (!this.isAttached && Polymer.dom(cellContent).parentNode === this.target) {
