@@ -39,10 +39,10 @@
       },
 
       _rowsChanged: function(rows) {
-        Polymer.dom(this).innerHTML = '';
+        // Polymer.dom(this).innerHTML = '';
 
         rows.forEach(function(row) {
-          Polymer.dom(this).appendChild(row);
+          Polymer.dom(this.domHost.domHost.$.scroller).appendChild(row);
         }.bind(this));
       }
     };

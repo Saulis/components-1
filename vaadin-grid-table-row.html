@@ -1,6 +1,27 @@
 <link rel="import" href="vaadin-grid-table-cell.html">
 
-<dom-module id="vaadin-grid-table-row"></dom-module>
+<dom-module id="vaadin-grid-table-row">
+  <template>
+    <style>
+      :host(:not([hidden])) {
+        display: flex;
+        width: 100%;
+      }
+
+      :host([slot="items"]) {
+        box-sizing: border-box;
+        margin: 0;
+        position: absolute;
+      }
+
+      ::slotted(.vaadin-grid-cell) {
+        background: red;
+      }
+    </style>
+    <slot></slot>
+  </template>
+
+</dom-module>
 <dom-module id="vaadin-grid-table-header-row"></dom-module>
 
 <script>
@@ -256,6 +277,10 @@
     Polymer({
       is: 'vaadin-grid-table-row',
 
+      hostAttributes: {
+        'slot': 'items'
+      },
+
       behaviors: [
         vaadinGridTableRowBehavior
       ],
@@ -267,6 +292,10 @@
 
     Polymer({
       is: 'vaadin-grid-table-header-row',
+
+      hostAttributes: {
+        'slot': 'header'
+      },
 
       behaviors: [
         vaadinGridTableRowBehavior
@@ -288,6 +317,10 @@
 
     Polymer({
       is: 'vaadin-grid-table-footer-row',
+
+      hostAttributes: {
+        'slot': 'footer'
+      },
 
       behaviors: [
         vaadinGridTableRowBehavior

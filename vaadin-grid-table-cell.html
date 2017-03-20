@@ -66,7 +66,7 @@
         '_itemChanged(item, instance)',
         '_instanceChanged(instance, target)',
         '_selectedChanged(selected, instance)',
-        '_toggleContent(isAttached, _cellContent, _insertionPoint, _scrollerInsertionPoint)',
+        '_toggleContent(isAttached, _cellContent, _insertionPoint)',
         '_toggleInstance(isAttached, _templatizer, instance)',
         '_widthChanged(width)',
         '_orderChanged(order)',
@@ -166,8 +166,8 @@
         this.colSpan = childColumns.length;
       },
 
-      _toggleContent: function(isAttached, cellContent, insertionPoint, scrollerInsertionPoint) {
-        if (isAttached === undefined || cellContent === undefined || insertionPoint === undefined || scrollerInsertionPoint === undefined) {
+      _toggleContent: function(isAttached, cellContent, insertionPoint) {
+        if (isAttached === undefined || cellContent === undefined || insertionPoint === undefined) {
           return;
         }
 
@@ -176,11 +176,11 @@
             Polymer.dom(this.target).appendChild(cellContent);
           }
           Polymer.dom(this).appendChild(insertionPoint);
-          Polymer.dom(this.target.$.scroller).insertBefore(scrollerInsertionPoint, Polymer.dom(this.target.$.scroller).firstElementChild);
+          // Polymer.dom(this.target.$.scroller).insertBefore(scrollerInsertionPoint, Polymer.dom(this.target.$.scroller).firstElementChild);
         } else {
           this.async(function() {
             if (!this.isAttached && Polymer.dom(cellContent).parentNode === this.target) {
-              Polymer.dom(this.target.$.scroller).removeChild(scrollerInsertionPoint);
+              // Polymer.dom(this.target.$.scroller).removeChild(scrollerInsertionPoint);
               Polymer.dom(this.target).removeChild(cellContent);
             }
           });
@@ -232,9 +232,9 @@
         if (Polymer.Element) {
           this._cellContent.setAttribute('slot', 'cell-content-id-' + contentId);
 
-          this._scrollerInsertionPoint = document.createElement('slot');
-          this._scrollerInsertionPoint.setAttribute('name', 'cell-content-id-' + contentId);
-          this._scrollerInsertionPoint.setAttribute('slot', 'cell-content-id-' + contentId);
+          // this._scrollerInsertionPoint = document.createElement('slot');
+          // this._scrollerInsertionPoint.setAttribute('name', 'cell-content-id-' + contentId);
+          // this._scrollerInsertionPoint.setAttribute('slot', 'cell-content-id-' + contentId);
 
           this._insertionPoint = document.createElement('slot');
           this._insertionPoint.setAttribute('name', 'cell-content-id-' + contentId);
@@ -242,8 +242,8 @@
         } else {
           this._cellContent.setAttribute('data-cell-content-id', contentId);
 
-          this._scrollerInsertionPoint = document.createElement('content');
-          this._scrollerInsertionPoint.setAttribute('select', '[data-cell-content-id="' + contentId + '"]');
+          // this._scrollerInsertionPoint = document.createElement('content');
+          // this._scrollerInsertionPoint.setAttribute('select', '[data-cell-content-id="' + contentId + '"]');
 
           this._insertionPoint = document.createElement('content');
           this._insertionPoint.setAttribute('select', '[data-cell-content-id="' + contentId + '"]');

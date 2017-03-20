@@ -48,11 +48,11 @@
         border-bottom: 0 solid transparent;
       }
 
-      #items > .vaadin-grid-row {
+      /*#items > .vaadin-grid-row {
         box-sizing: border-box;
         margin: 0;
         position: absolute;
-      }
+      }*/
 
       vaadin-grid-table-table {
         height: 100%;
@@ -70,12 +70,12 @@
         display: block;
       }
 
-      vaadin-grid-table-header .vaadin-grid-cell,
+      /*vaadin-grid-table-header .vaadin-grid-cell,
       vaadin-grid-table-footer .vaadin-grid-cell {
         top: 0;
-      }
+      }*/
 
-      .vaadin-grid-cell {
+      /*::slotted(.vaadin-grid-cell) {
         padding: 0;
         flex-shrink: 0;
         flex-grow: 1;
@@ -83,19 +83,19 @@
         display: flex;
       }
 
-      .vaadin-grid-cell:not([detailscell]) {
+      ::slotted(.vaadin-grid-cell:not([detailscell])) {
         position: relative;
-      }
+      }*/
 
       /* TODO */
-      .vaadin-grid-cell ::slotted(.cell-content) {
+      /*.vaadin-grid-cell ::slotted(.cell-content) {
          width: 100%;
          display: inline-flex;
          justify-content: center;
          flex-direction: column;
          white-space: nowrap;
          overflow: hidden;
-      }
+      }*/
 
       .vaadin-grid-column-resize-handle {
         position: absolute;
@@ -135,10 +135,10 @@
         overflow: hidden;
       }
 
-      .vaadin-grid-row:not([hidden]) {
+      /*::slotted(.vaadin-grid-row:not([hidden])) {
         display: flex;
         width: 100%;
-      }
+      }*/
 
       [frozen] {
         z-index: 2;
@@ -184,7 +184,7 @@
     <style>
 
       /* Default borders */
-      vaadin-grid-table-header .vaadin-grid-row:last-child .vaadin-grid-cell ::slotted(.cell-content) {
+      vaadin-grid-table-header ::slotted(.vaadin-grid-row) {
         border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.08));
       }
 
@@ -279,9 +279,15 @@
       <div id="sizerwrapper">
         <vaadin-grid-sizer id="fixedsizer" top="[[_estScrollHeight]]" column-tree="[[columnTree]]"></vaadin-grid-sizer>
       </div>
-      <vaadin-grid-table-header id="header" target="[[target]]" column-tree="[[columnTree]]"></vaadin-grid-table-header>
-      <vaadin-grid-table-body id="items"></vaadin-grid-table-body>
-      <vaadin-grid-table-footer id="footer" target="[[target]]" column-tree="[[columnTree]]"></vaadin-grid-table-footer>
+      <vaadin-grid-table-header id="header" target="[[target]]" column-tree="[[columnTree]]">
+        <slot name="header"></slot>
+      </vaadin-grid-table-header>
+      <vaadin-grid-table-body id="items">
+        <slot name="items"></slot>
+      </vaadin-grid-table-body>
+      <vaadin-grid-table-footer id="footer" target="[[target]]" column-tree="[[columnTree]]">
+        <slot name="footer"></slot>
+      </vaadin-grid-table-footer>
     </vaadin-grid-table-table>
 
     <vaadin-grid-table-outer-scroller
@@ -502,7 +508,8 @@
         row.target = this.domHost;
         physicalItems[i] = row;
         row.setAttribute('hidden', ''); // hidden by default, removed when data is bound.
-        Polymer.dom(this.$.items).appendChild(row);
+        // Polymer.dom(this.$.items).appendChild(row);
+        Polymer.dom(this.domHost.$.scroller).appendChild(row);
       }
 
       return physicalItems;

@@ -228,6 +228,79 @@ first element in the cell will be focused. You can override the behavior by appl
         width: 100%;
       }
 
+      /* temp */
+      .vaadin-grid-row:not([hidden]) {
+        display: flex;
+        width: 100%;
+      }
+
+      vaadin-grid-table-row[slot="items"].vaadin-grid-row {
+        box-sizing: border-box;
+        margin: 0;
+        position: absolute;
+      }
+
+      vaadin-grid-table-header-row .vaadin-grid-cell,
+      vaadin-grid-table-footer-row .vaadin-grid-cell {
+        top: 0;
+      }
+
+      .vaadin-grid-cell {
+        padding: 0;
+        flex-shrink: 0;
+        flex-grow: 1;
+        box-sizing: border-box;
+        display: flex;
+      }
+
+      .vaadin-grid-cell ::slotted(.cell-content) {
+         width: 100%;
+         display: inline-flex;
+         justify-content: center;
+         flex-direction: column;
+         white-space: nowrap;
+         overflow: hidden;
+      }
+
+      .vaadin-grid-row .vaadin-grid-cell:not([detailscell]) ::slotted(.cell-content) {
+        background: #fff;
+        text-align: left;
+        padding: 8px;
+        box-sizing: border-box;
+        @apply(--vaadin-grid-cell);
+      }
+
+      vaadin-grid-table-header-row.vaadin-grid-row .vaadin-grid-cell:not([detailscell]) ::slotted(.cell-content) {
+        font-weight: 500;
+        @apply(--vaadin-grid-header-cell);
+      }
+
+      vaadin-grid-table-footer-row.vaadin-grid-row .vaadin-grid-cell:not([detailscell]) ::slotted(.cell-content) {
+        font-weight: 500;
+        @apply(--vaadin-grid-footer-cell);
+      }
+
+      .vaadin-grid-row .vaadin-grid-cell.vaadin-grid-cell[lastcolumn] ::slotted(.cell-content) {
+        border-right: none;
+      }
+
+       /* Default borders */
+      vaadin-grid-table-header .vaadin-grid-row:last-child .vaadin-grid-cell ::slotted(.cell-content) {
+        border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.08));
+      }
+
+      vaadin-grid-table-footer .vaadin-grid-row:first-child .vaadin-grid-cell ::slotted(.cell-content) {
+        border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.08));
+      }
+
+      vaadin-grid-table-row[slot="items"].vaadin-grid-row:not([lastrow]) .vaadin-grid-cell ::slotted(.cell-content) {
+        border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.08));
+      }
+
+      [last-frozen] ::slotted(.cell-content) {
+        border-right: 1px solid var(--divider-color, rgba(0, 0, 0, 0.08));
+      }
+
     </style>
     <vaadin-grid-table id="scroller" loading$=[[_loading]] bind-data="[[_bindData]]" size="[[size]]"
         column-tree="[[_columnTree]]" content-target="[[_getContentTarget()]]"
