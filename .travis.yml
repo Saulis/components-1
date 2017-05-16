@@ -29,12 +29,20 @@ before_script:
   # - xvfb-run -s '-screen 0 1024x768x24' polymer test -l firefox
 
 script:
-  - if [[ "$TRAVIS_EVENT_TYPE" == "push" && "$TRAVIS_BRANCH" != quick/* ]]; then
-      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs;
-    fi
-  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then
-      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron;
-    fi
+  - polymer test test/basic.html test/app-localize-behavior.html test/column.html test/column-group.html --env saucelabs
+  - polymer test test/column-groups.html test/column-resizing.html test/column-reordering.html test/data-provider.html --env saucelabs
+  - polymer test test/filtering.html test/keyboard-navigation.html test/physical-count.html test/hidden-grid.html --env saucelabs
+  - polymer test test/million-dollar-scrolling.html test/dynamic-item-size.html test/frozen-columns.html test/outer-scroller.html --env saucelabs
+  - polymer test test/templates.html test/scrolling-mode.html test/row-height.html test/row-details.html --env saucelabs
+  - polymer test test/selecting.html test/style-scope.html test/array-data-provider.html test/sorting.html --env saucelabs
+  - polymer test test/light-dom-observing.html test/themability.html test/scroll-to-index.html test/resizing.html --env saucelabs
+  - xvfb-run -s '-screen 0 1024x768x24' polymer test test/doctype.html test/lazy-import.html
+  # - if [[ "$TRAVIS_EVENT_TYPE" == "push" && "$TRAVIS_BRANCH" != quick/* ]]; then
+  #     xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs;
+  #   fi
+  # - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then
+  #     xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron;
+  #   fi
   - gemini test test/visual
 
 after_success:
